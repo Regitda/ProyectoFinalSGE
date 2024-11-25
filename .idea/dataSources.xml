@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="OnlineMarket@localhost" uuid="21d2ab17-35ff-4f7e-a5c3-a284cda9a5ec">
+    <data-source source="LOCAL" name="examen 10@localhost" uuid="21d2ab17-35ff-4f7e-a5c3-a284cda9a5ec">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:1405/OnlineMarket</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/examen+10</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="examen 10@localhost [2]" uuid="922dc827-45e9-48e3-a40d-6f72cfd42506">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/examen+10</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

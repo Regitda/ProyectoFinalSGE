@@ -25,7 +25,7 @@ import java.util.*;
 public class SellerController {
 
     @FXML
-    private TextField cifField, nameField, businessNameField, phoneField, emailField, passwordField;
+    private TextField cifField, nameField, businessNameField, phoneField, emailField, passwordField, urlField;
 
     public void initialize() {
         var seller = PersistentData.getInstance().getSeller();
@@ -36,6 +36,7 @@ public class SellerController {
             businessNameField.setText(seller.businessName);
             phoneField.setText(seller.phone);
             emailField.setText(seller.email);
+            urlField.setText(seller.url);
             passwordField.setText("");
         }
     }
@@ -44,11 +45,13 @@ public class SellerController {
     @FXML
     private void onSubmitButtonPressed() {
 
+        String validationErrors = "";
         String name = Optional.ofNullable(nameField.getText()).orElse("").trim();
         String businessName = Optional.ofNullable(businessNameField.getText()).orElse("").trim();
         String phone = Optional.ofNullable(phoneField.getText()).orElse("").trim();
         String email = Optional.ofNullable(emailField.getText()).orElse("").trim();
         String password = Optional.ofNullable(passwordField.getText()).orElse("").trim();
+        String url = Optional.ofNullable(urlField.getText()).orElse("").trim();
 
         if (name.isEmpty() || businessName.isEmpty() || phone.isEmpty()) {
             showAlert("Validation Error", "Name, Business Name, Phone, and Email are required!", AlertType.ERROR);
@@ -58,9 +61,14 @@ public class SellerController {
         Map<String, Object> fieldsToUpdate = new HashMap<>();
         var seller = PersistentData.getInstance().getSeller();
 
-        if (!name.equals(seller.name) && ValidationUtils.isValidName(name)) {
-            fieldsToUpdate.put("name", name);
-            seller.name = name;
+        if (!name.equals(seller.name)) {
+            if (ValidationUtils.isValidName(name)) {
+                validationErrors += "Name: " + name + " is Invalid\n";
+            } else {
+                fieldsToUpdate.put("name", name);
+                seller.name = name;
+            }
+
         }
 
         if (!businessName.equals(seller.businessName)) {
@@ -68,14 +76,34 @@ public class SellerController {
             seller.businessName = businessName;
         }
 
-        if (!phone.equals(seller.phone) && ValidationUtils.isValidPhone(phone)) {
-            fieldsToUpdate.put("phone", phone);
-            seller.phone = phone;
+        if (!phone.equals(seller.phone)) {
+            if (!ValidationUtils.isValidPhone(phone)) {
+                validationErrors += "Phone: " + phone + " is Invalid\n";
+            } else {
+                fieldsToUpdate.put("phone", phone);
+                seller.phone = phone;
+            }
+
         }
 
-        if (!email.isEmpty() && !email.equals(seller.email) && ValidationUtils.isValidEmail(email)) {
-            fieldsToUpdate.put("email", email);
-            seller.email = email;
+        if (!url.isBlank() && !url.equals(seller.url)) {
+            if (!ValidationUtils.isValidUrl(url)) {
+                validationErrors += "Url: " + url + " is Invalid\n";
+            } else {
+                fieldsToUpdate.put("url", url);
+                seller.url = url;
+            }
+
+        }
+
+        if (!email.isEmpty() && !email.equals(seller.email)) {
+            if (!ValidationUtils.isValidEmail(email)) {
+                validationErrors += "Email: " + email + " is Invalid\n";
+            } else {
+                fieldsToUpdate.put("email", email);
+                seller.email = email;
+            }
+
         }
 
         if (!password.isEmpty()) {
@@ -89,9 +117,14 @@ public class SellerController {
 
         if (!fieldsToUpdate.isEmpty()) {
             UpdateSeller(seller.cif, fieldsToUpdate);
-            showAlert("Success", "Seller data saved successfully!", AlertType.INFORMATION);
+            showAlert("Success", "Seller data saved successfully!\n" + validationErrors, AlertType.INFORMATION);
         } else {
-            showAlert("Information", "No changes detected.", AlertType.INFORMATION);
+            if (validationErrors.isBlank()) {
+                showAlert("Information", "No changes detected.", AlertType.INFORMATION);
+                return;
+            } else {
+                showAlert("Validation Errors:", validationErrors, AlertType.ERROR);
+            }
         }
 
         passwordField.clear();
@@ -169,7 +202,7 @@ public class SellerController {
     }
 
     @FXML
-    private void OnAddOfferClicked() throws IOException {
+    private void OnOfferClicked() throws IOException {
 
         Parent offerRoot = FxmlUtils.getInstance().getFxmlLoader("/addOffer.fxml").load();
         Stage stage = (Stage) cifField.getScene().getWindow();

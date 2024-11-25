@@ -5,10 +5,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseUtils {
-    private static final String DB_URL = "jdbc:postgresql://localhost:1405/OnlineMarket";
+    //private static final String DB_URL = "jdbc:postgresql://localhost:1405/OnlineMarket";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/examen+10";
     private static final String DB_USER = "postgres";
-    private static final String DB_PASSWORD = "1405";
-
+    //private static final String DB_PASSWORD = "1405";
+    private static final String DB_PASSWORD = "postgres";
     private static Connection connection = null;
 
     private DatabaseUtils() {} // Java apparently creates a public constructor if there is none.

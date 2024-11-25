@@ -1,6 +1,8 @@
 package com.Project;
 
+import com.Project.Data.PersistentData;
 import com.Project.Utils.DatabaseUtils;
+import com.Project.Utils.SerializationUtils;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -22,6 +24,9 @@ public class FpApplication extends Application {
     @Override
     public void stop() {
         DatabaseUtils.closeConnection();
+        if(!PersistentData.getInstance().rememberMeStatus){
+            SerializationUtils.ClearFile("username.txt");
+        }
     }
 
     public static void main(String[] args) {

@@ -4,6 +4,7 @@ import com.Project.Data.PersistentData;
 import com.Project.Data.Product;
 import com.Project.Utils.DatabaseUtils;
 import com.Project.Utils.FxmlUtils;
+import com.Project.Utils.SerializationUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class LoginController {
     @FXML
@@ -29,6 +31,15 @@ public class LoginController {
 
     @FXML
     private PasswordField txtPassword;
+
+    private final String usernameFile = "username.txt";
+
+    @FXML
+    private void OnRememberMe() {
+        PersistentData.getInstance().rememberMeStatus = !PersistentData.getInstance().rememberMeStatus;
+    }
+    private int sellerId = 0;
+
 
     @FXML
     protected void onLoginButtonClick() {
@@ -53,7 +64,10 @@ public class LoginController {
                 Parent sellerPageRoot = FxmlUtils.getInstance().getFxmlLoader("/sellerData.fxml").load();
                 Stage stage = (Stage) txtLogin.getScene().getWindow();
 
-                // Have to download the data from offers into the database.
+                // Have to download the data from offers into the database. Doesn¨t work yet.
+                //downloadSellerOffersFromDB(sellerId);
+                //downloadProductsNamesFromDb();
+
 
                 stage.setScene(new Scene(sellerPageRoot));
                 stage.setTitle("Seller Page");
@@ -72,6 +86,11 @@ public class LoginController {
         }
     }
 
+    public void initialize() {
+
+        String login = Optional.ofNullable(SerializationUtils.DeserializeFile(usernameFile)).orElse("").trim();
+        txtLogin.setText(login);
+    }
 
     // I'm seeing at lest a few possible ways to just hack a person with just CIF. But its local project.
     private boolean validateCredentials(String username, String password) {
@@ -92,7 +111,15 @@ public class LoginController {
                     seller.phone = resultSet.getString("phone");
                     seller.email = resultSet.getString("email");
                     seller.password = resultSet.getString("plain_password");
+                    seller.url = resultSet.getString("url");
+                    seller.isPro = resultSet.getBoolean("pro");
+                    sellerId = resultSet.getInt("seller_id");
 
+                    if (PersistentData.getInstance().rememberMeStatus) {
+                        SerializationUtils.SerializeFile(username, usernameFile);
+                    } else {
+                        SerializationUtils.ClearFile(usernameFile);
+                    }
                     return true;
                 } else {
                     return false;
@@ -106,8 +133,8 @@ public class LoginController {
         return false;
     }
 
-    private boolean downloadProductsFromDB() {
-        String query = "SELECT product_id, product_name FROM Products";
+    private void downloadProductsNamesFromDb() {
+        String query = "SELECT product_id, product_name FROM Products ORDER BY product_id";
 
         List<Product> productList = new ArrayList<>();
         try (PreparedStatement preparedStatement = DatabaseUtils.getConnection().prepareStatement(query)) {
@@ -125,14 +152,14 @@ public class LoginController {
             e.printStackTrace();
             lblError.setText("Database error. Please try again.");
         }
-        return false;
     }
 
-    private boolean downloadUserOrdersFromDB() {
-        String query = "SELECT product_id,offer_price,offer_start_date,offer_end_date " + "FROM seller_products " + "WHERE seller_id=?";
+    private void downloadSellerOffersFromDB(String username) {
+        String query = "SELECT product_id,offer_price,offer_start_date,offer_end_date " + "FROM seller_products " + "WHERE seller_id=? ORDER BY seller_product_id ";
 
         List<Product> productList = new ArrayList<>();
         try (PreparedStatement preparedStatement = DatabaseUtils.getConnection().prepareStatement(query)) {
+            preparedStatement.setString(1, username);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
@@ -147,6 +174,5 @@ public class LoginController {
             e.printStackTrace();
             lblError.setText("Database error. Please try again.");
         }
-        return false;
     }
 }

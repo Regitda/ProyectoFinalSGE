@@ -6,10 +6,11 @@ import java.util.List;
 
 public class PersistentData {
 
+
     private Seller sellerData;
     public final List<Product> Product;
     public final List<Order> orders;
-
+    public boolean rememberMeStatus;
     private PersistentData() {
         this.sellerData = new Seller();
         this.Product = new ArrayList<>();

@@ -26,5 +26,6 @@
             <Font size="16.0" />
          </font>
       </Button>
+      <CheckBox layoutX="120.0" layoutY="147.0" mnemonicParsing="false" onAction="#OnRememberMe" text="Remember me" />
    </children>
 </AnchorPane>
